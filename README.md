@@ -1,3 +1,5 @@
+[![CI Pipeline](https://github.com/omarandstuff/vehicles-challenge/actions/workflows/ci.yml/badge.svg)](https://github.com/omarandstuff/vehicles-challenge/actions/workflows/ci.yml)
+
 # Vehicles Challenge
 
 This repository contains the solution to the vehicles challenge. The solution is implemented using NestJS, MongoDB, and GraphQL. It also has been containerized using Docker and the development and testing environments are managed using Docker Compose.
