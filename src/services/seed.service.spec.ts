@@ -4,6 +4,7 @@ import { VehicleMakeService } from './vehicle-make.service';
 import axios from 'axios';
 import { parseStringPromise } from 'xml2js';
 import { Logger } from '@nestjs/common';
+import * as fs from 'fs';
 
 jest.mock('axios');
 jest.mock('xml2js', () => ({
@@ -88,9 +89,9 @@ describe('SeedService', () => {
         { makeId: '2', makeName: 'Honda', vehicleTypes: [] },
       ];
 
-      jest.mock('../seed-data/vehicle-makes.json', () => mockVehicleMakes, {
-        virtual: true,
-      });
+      jest
+        .spyOn(fs, 'readFileSync')
+        .mockReturnValue(JSON.stringify(mockVehicleMakes));
 
       await service['seedVehicleMakesFromLocalFile']();
 
