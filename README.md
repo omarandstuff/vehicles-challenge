@@ -1,85 +1,96 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Vehicles Challenge
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+This repository contains the solution to the vehicles challenge. The solution is implemented using NestJS, MongoDB, and GraphQL. It also has been containerized using Docker and the development and testing environments are managed using Docker Compose.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Data seeding
 
-## Description
+The challenge requires the db to be populated from the https://vpic.nhtsa.dot.gov/api API. It can take several minutes to seed the db retrieving all the data from the API. So this project has 2 ways of seeding the db from a local captured version of the data and from the internet using the api.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+To use the local version of the data, change the docker-compose file environment variable `SEED_SOURCE` to `LOCAL_FILE` or if you want to seed the db from the API, change the environment variable to `INTERNET`.
 
-## Project setup
-
-```bash
-$ npm install
+```docker
+environment:
+  - SEED_SOURCE=LOCAL_FILE
 ```
 
-## Compile and run the project
+## Running the project
+
+Once you decide the source of the data, you can run the project using the following command:
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+npm run composer:watch
 ```
 
-## Run tests
+This will start the project in watch mode, so any changes you make to the code will be automatically reloaded.
+
+## Testing
+
+To run the tests, you can use the following command:
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npm run composer:test
 ```
 
-## Resources
+This will run the tests and generate a coverage report.
 
-Check out a few resources that may come in handy when working with NestJS:
+## GraphQL
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+The project has a GraphQL playground that you can use to test the queries and mutations. You can access it by going to `http://localhost:3000/graphql`.
 
-## Support
+### Fetch vehicle makes
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+The following query can be used to fetch the vehicle makes:
 
-## Stay in touch
+```graphql
+query {
+  getVehicleMakes(first: 10) {
+    edges {
+      cursor
+      node {
+        makeId
+        makeName
+        vehicleTypes {
+          typeId
+          typeName
+        }
+      }
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
+}
+```
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+It is paginated using a cursor and the first argument. To fetch the next page, you can use the following query:
 
-## License
+```graphql
+query {
+  getVehicleMakes(first: 10, after: "cursor") {
+    edges {
+      cursor
+      node {
+        makeId
+        makeName
+        vehicleTypes {
+          typeId
+          typeName
+        }
+      }
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
+}
+```
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+where cursor is the cursor described in the pageInfo in previous query.
+
+## MongoDB
+
+The project uses MongoDB as the database. The database is seeded with the vehicle makes and models. The models are related to the makes using the `makeId` field.
+
+We use mongodb because it is a NoSQL database and it is easy to work with JSON-like data. It is also easy to scale horizontally and it is a good choice for this kind of data.
