@@ -3,12 +3,12 @@ import { VehicleType } from './vehicle-type.type';
 
 @ObjectType({ description: 'Vehicle Make' })
 export class VehicleMake {
-  @Field((type) => ID)
+  @Field(() => ID)
   makeId: string;
 
   @Field()
   makeName: string;
 
-  @Field((type) => [VehicleType])
+  @Field(() => [VehicleType])
   vehicleTypes: VehicleType[];
 }

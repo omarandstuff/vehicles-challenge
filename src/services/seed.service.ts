@@ -2,6 +2,8 @@ import { Injectable, Logger } from '@nestjs/common';
 import axios from 'axios';
 import { parseStringPromise } from 'xml2js';
 import { VehicleMakeService } from './vehicle-make.service';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class SeedService {
@@ -28,7 +30,12 @@ export class SeedService {
   }
 
   private async seedVehicleMakesFromLocalFile(): Promise<void> {
-    const loadedData: any[] = require('../seed-data/vehicle-makes.json');
+    const loadedData: any[] = JSON.parse(
+      fs.readFileSync(
+        path.resolve('./src/seed-data/vehicle-makes.json'),
+        'utf8',
+      ),
+    );
 
     for (let i = 0; i < loadedData.length; i++) {
       const currentMake = loadedData[i];
